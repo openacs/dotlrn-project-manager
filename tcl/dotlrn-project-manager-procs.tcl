@@ -122,8 +122,44 @@ ad_proc -public dotlrn_project_manager::add_applet_to_community_helper {
 
     project_manager_task_portlet::add_self_to_page -portal_id $portal_id -project_manager_id $package_id
 
-    # this should return the package_id
 
+    # instantiate and mount the logger package for this pm
+
+    set logger_package_id [dotlrn::instantiate_and_mount \
+			-mount_point "logger" \
+			$community_id \
+			"logger" \
+		       ]
+
+    # (appl.)link the pm to the logger,
+ 
+
+    
+    application_link::new -this_package_id $package_id -target_package_id $logger_package_id
+
+
+    # and now to the existing fs, conntacts, forums package
+    # of this community
+
+
+    
+    foreach target_key [list "[dotlrn_community::get_community_url $community_id]forums" "[dotlrn_community::get_community_url $community_id]file-storage" "/contacts/"] {
+
+	set site_node_inf [site_node::get_from_url -url $target_key]
+
+	set target_package_id [lindex $site_node_inf 19]
+	set is_package_id [lindex $site_node_inf 18]
+  
+	if {![empty_string_p $target_package_id] && $is_package_id == "package_id"} {
+	    
+	        application_link::new -this_package_id $package_id -target_package_id $target_package_id
+	
+	}
+	
+    } 
+    
+
+    # this should return the package_id
     return $package_id
 }
 
