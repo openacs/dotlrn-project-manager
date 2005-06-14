@@ -55,6 +55,8 @@ ad_proc -public dotlrn_project_manager::add_applet {
     # FIXME: won't work with multiple dotlrn instances Use the package_key
     # for the -url param - "/" are not allowed!
 
+    set package_id 0
+
     if {![dotlrn::is_package_mounted \
 	      -package_key [package_key]]} {
 	set package_id [dotlrn::mount_package \
@@ -63,7 +65,8 @@ ad_proc -public dotlrn_project_manager::add_applet {
 			    -directory_p "t"]
     }
 
-    dotlrn_applet::add_applet_to_dotlrn -applet_key [applet_key] -package_key [my_package_key]
+    dotlrn_applet::add_applet_to_dotlrn -applet_key [applet_key] -package_key [my_package_key] -package_id $package_id
+
 }
 
 ad_proc -public dotlrn_project_manager::remove_applet {
@@ -118,9 +121,9 @@ ad_proc -public dotlrn_project_manager::add_applet_to_community_helper {
 
     # Add all portlets to the Portal.
 
-    project_manager_portlet::add_self_to_page -portal_id $portal_id -project_manager_id $package_id
+    project_manager_portlet::add_self_to_page -portal_id $portal_id -package_id $package_id -project_manager_id $package_id
 
-    project_manager_task_portlet::add_self_to_page -portal_id $portal_id -project_manager_id $package_id
+    project_manager_task_portlet::add_self_to_page -portal_id $portal_id  -package_id $package_id -project_manager_id $package_id
 
 
     # instantiate and mount the logger package for this pm
@@ -194,6 +197,27 @@ ad_proc -public dotlrn_project_manager::add_user_to_community {
 } {
     Add a user to a community
 } {
+
+    set package_id [dotlrn_community::get_applet_package_id -community_id $community_id -applet_key [applet_key]]
+    set portal_id [dotlrn::get_portal_id -user_id $user_id]
+    
+    # use "append" here since we want to aggregate
+    set param_action append
+
+    # Add both portlets
+    project_manager_portlet::add_self_to_page \
+        -portal_id $portal_id \
+        -package_id $package_id \
+	-project_manager_id $package_id \
+        -param_action $param_action
+
+    project_manager_task_portlet::add_self_to_page \
+        -portal_id $portal_id \
+        -package_id $package_id \
+	-project_manager_id $package_id \
+        -param_action $param_action
+
+
 }
 
 ad_proc -public dotlrn_project_manager::remove_user_from_community {
@@ -211,7 +235,7 @@ ad_proc -public dotlrn_project_manager::add_portlet {
 
     @param portal_id
 } {
-    project_manager_portlet::add_self_to_page -portal_id $portal_id -project_manager_id 0
+    project_manager_portlet::add_self_to_page -portal_id $portal_id -project_manager_id 0 -package_id 0
 
     #    add_portlet_helper $portal_id $args
 }
