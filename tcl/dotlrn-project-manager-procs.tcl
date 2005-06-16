@@ -65,7 +65,7 @@ ad_proc -public dotlrn_project_manager::add_applet {
 			    -directory_p "t"]
     }
 
-    dotlrn_applet::add_applet_to_dotlrn -applet_key [applet_key] -package_key [my_package_key] -package_id $package_id
+    dotlrn_applet::add_applet_to_dotlrn -applet_key [applet_key] -package_key [my_package_key]
 
 }
 
