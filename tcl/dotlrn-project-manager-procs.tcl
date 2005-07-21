@@ -124,6 +124,8 @@ ad_proc -public dotlrn_project_manager::add_applet_to_community_helper {
     project_manager_portlet::add_self_to_page -portal_id $portal_id -package_id $package_id -project_manager_id $package_id
 
     project_manager_task_portlet::add_self_to_page -portal_id $portal_id  -package_id $package_id -project_manager_id $package_id
+    project_manager_calendar_portlet::add_self_to_page -portal_id $portal_id  -package_id $package_id -project_manager_id $package_id
+
 
 
     # instantiate and mount the logger package for this pm
@@ -216,6 +218,13 @@ ad_proc -public dotlrn_project_manager::add_user_to_community {
         -package_id $package_id \
 	-project_manager_id $package_id \
         -param_action $param_action
+
+    project_manager_calendar_portlet::add_self_to_page \
+        -portal_id $portal_id \
+        -package_id $package_id \
+	-project_manager_id $package_id \
+        -param_action $param_action
+
 
 
 }
