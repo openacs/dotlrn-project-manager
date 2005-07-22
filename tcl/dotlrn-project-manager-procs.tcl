@@ -10,9 +10,9 @@
 #  details.
 
 ad_library {
-
+    
     the dotlrn applet for calendar
-
+    
     @author ben@openforce.net,arjun@openforce.net
     @version $Id$
 }
@@ -51,12 +51,12 @@ ad_proc -public dotlrn_project_manager::add_applet {
     Called for one time init - must be repeatable!
     @return new pkg_id or 0 on failure
 } {
-
+    
     # FIXME: won't work with multiple dotlrn instances Use the package_key
     # for the -url param - "/" are not allowed!
-
+    
     set package_id 0
-
+    
     if {![dotlrn::is_package_mounted \
 	      -package_key [package_key]]} {
 	set package_id [dotlrn::mount_package \
@@ -64,9 +64,9 @@ ad_proc -public dotlrn_project_manager::add_applet {
 			    -url [package_key] \
 			    -directory_p "t"]
     }
-
+    
     dotlrn_applet::add_applet_to_dotlrn -applet_key [applet_key] -package_key [my_package_key]
-
+    
 }
 
 ad_proc -public dotlrn_project_manager::remove_applet {
@@ -93,7 +93,7 @@ ad_proc -public dotlrn_project_manager::add_applet_to_community {
     set results [add_applet_to_community_helper \
 		     -community_id $community_id
 		]
-
+    
     return [lindex $results 0]
 }
 
@@ -101,10 +101,10 @@ ad_proc -public dotlrn_project_manager::add_applet_to_community_helper {
     {-community_id:required}
 } {
     Add the calendar applet to a specific dotlrn community
-
+    
     @params community_id
 } {
-
+    
     # Create and Mount the Project Manager Package
 
     set package_id [dotlrn::instantiate_and_mount \
@@ -112,58 +112,59 @@ ad_proc -public dotlrn_project_manager::add_applet_to_community_helper {
 			$community_id \
 			[package_key] \
 		       ]
-
+    
     # Set up the project manager portlet for this portal/community
-
+    
     set portal_id [dotlrn_community::get_portal_id \
 		       -community_id $community_id \
 		      ]
-
+    
     # Add all portlets to the Portal.
-
+    
     project_manager_portlet::add_self_to_page -portal_id $portal_id -package_id $package_id -project_manager_id $package_id
 
     project_manager_task_portlet::add_self_to_page -portal_id $portal_id  -package_id $package_id -project_manager_id $package_id
     project_manager_calendar_portlet::add_self_to_page -portal_id $portal_id  -package_id $package_id -project_manager_id $package_id
-
-
-
+    
+    project_manager_project_calendar_portlet::add_self_to_page -portal_id $portal_id  -package_id $package_id -project_manager_id $package_id
+    
+    
     # instantiate and mount the logger package for this pm
-
+    
     set logger_package_id [dotlrn::instantiate_and_mount \
-			-mount_point "logger" \
-			$community_id \
-			"logger" \
-		       ]
-
+			       -mount_point "logger" \
+			       $community_id \
+			       "logger" \
+			      ]
+    
     # (appl.)link the pm to the logger,
- 
-
+    
+    
     
     application_link::new -this_package_id $package_id -target_package_id $logger_package_id
-
-
+    
+    
     # and now to the existing fs, conntacts, forums package
     # of this community
-
-
+    
+    
     
     foreach target_key [list "[dotlrn_community::get_community_url $community_id]forums" "[dotlrn_community::get_community_url $community_id]file-storage" "/contacts/"] {
-
+	
 	set site_node_inf [site_node::get_from_url -url $target_key]
-
+	
 	set target_package_id [lindex $site_node_inf 19]
 	set is_package_id [lindex $site_node_inf 18]
-  
+	
 	if {![empty_string_p $target_package_id] && $is_package_id == "package_id"} {
 	    
-	        application_link::new -this_package_id $package_id -target_package_id $target_package_id
-	
+	    application_link::new -this_package_id $package_id -target_package_id $target_package_id
+	    
 	}
 	
     } 
     
-
+    
     # this should return the package_id
     return $package_id
 }
@@ -189,7 +190,7 @@ ad_proc -public dotlrn_project_manager::remove_user {
 } {
     Remove a user from dotlrn
 } {
-
+    
     # Not yet implemented.
 }
 
@@ -199,34 +200,41 @@ ad_proc -public dotlrn_project_manager::add_user_to_community {
 } {
     Add a user to a community
 } {
-
+    
     set package_id [dotlrn_community::get_applet_package_id -community_id $community_id -applet_key [applet_key]]
     set portal_id [dotlrn::get_portal_id -user_id $user_id]
     
     # use "append" here since we want to aggregate
     set param_action append
-
+    
     # Add both portlets
     project_manager_portlet::add_self_to_page \
         -portal_id $portal_id \
         -package_id $package_id \
 	-project_manager_id $package_id \
         -param_action $param_action
-
+    
     project_manager_task_portlet::add_self_to_page \
         -portal_id $portal_id \
         -package_id $package_id \
 	-project_manager_id $package_id \
         -param_action $param_action
-
+    
     project_manager_calendar_portlet::add_self_to_page \
         -portal_id $portal_id \
         -package_id $package_id \
 	-project_manager_id $package_id \
         -param_action $param_action
+    
+    project_manager_project_calendar_portlet::add_self_to_page \
+        -portal_id $portal_id \
+        -package_id $package_id \
+	-project_manager_id $package_id \
+        -param_action $param_action
+    
 
-
-
+    
+    
 }
 
 ad_proc -public dotlrn_project_manager::remove_user_from_community {
@@ -241,11 +249,11 @@ ad_proc -public dotlrn_project_manager::add_portlet {
     portal_id
 } {
     Set up default params for templates about to call add_portlet_helper
-
+    
     @param portal_id
 } {
     project_manager_portlet::add_self_to_page -portal_id $portal_id -project_manager_id 0 -package_id 0
-
+    
     #    add_portlet_helper $portal_id $args
 }
 
@@ -274,7 +282,7 @@ ad_proc -public dotlrn_project_manager::remove_portlet {
 } {
     A helper proc to remove the underlying portlet from the given portal.
     This is alot simpler than add_portlet.
-
+    
     @param portal_id
     @param args An ns_set with the project_manager_id.
 } {
@@ -285,7 +293,7 @@ ad_proc -public dotlrn_project_manager::remove_portlet {
     project_manager_portlet::remove_self_from_page \
 	-portal_id $portal_id \
 	-project_manager_id [ns_set get $args "project_manager_id"]
-
+    
     #    calendar_full_portlet::remove_self_from_page \
 	-portal_id $portal_id \
 	-calendar_id [ns_set get $args "calendar_id"]
@@ -309,7 +317,7 @@ ad_proc -public dotlrn_project_manager::change_event_handler {
 } {
     switch $event {
 	rename {
-
+	    
 	    #	    handle_rename -community_id $community_id -old_value
 	    #	$old_value -new_value $new_value
 	}
@@ -323,7 +331,7 @@ ad_proc -private dotlrn_project_manager::handle_rename {
 } {
     what to do in calendar when a dotlrn community is renamed
 } {
-
+    
     #    calendar::rename -calendar_id [get_group_calendar_id
     # -community_id $community_id] -calendar_name $new_value
 }
