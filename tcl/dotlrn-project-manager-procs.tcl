@@ -252,7 +252,25 @@ ad_proc -public dotlrn_project_manager::add_portlet {
     
     @param portal_id
 } {
-    project_manager_portlet::add_self_to_page -portal_id $portal_id -project_manager_id 0 -package_id 0
+    project_manager_portlet::add_self_to_page \
+	-portal_id $portal_id \
+	-project_manager_id 0 \
+	-package_id 0
+
+    project_manager_task_portlet::add_self_to_page \
+	-portal_id $portal_id \
+	-project_manager_id 0 \
+	-package_id 0
+
+    project_manager_calendar_portlet::add_self_to_page \
+	-portal_id $portal_id \
+	-project_manager_id 0 \
+	-package_id 0
+
+    project_manager_project_calendar_portlet::add_self_to_page \
+	-portal_id $portal_id \
+	-project_manager_id 0 \
+	-package_id 0
     
     #    add_portlet_helper $portal_id $args
 }
