@@ -355,3 +355,45 @@ ad_proc -private dotlrn_project_manager::handle_rename {
 }
 
 # Some dotlrn_project_manager specific procs
+
+ad_proc -private dotlrn_project_manager::upgrade {
+    {-from_version_name:required }
+    {-to_version_name:required }
+} {
+    Procedures to upgrade dotlrn-project-manager
+    
+    @author Miguel Marin (miguelmarin@viaro.net)
+    @author Viaro Networks www.viaro.net
+} {
+    apm_upgrade_logic \
+	-from_version_name $from_version_name \
+	-to_version_name $to_version_name \
+	-spec {
+	    0.1d 0.1d1 {
+		# We are going to add all the portlets of project-manager to the 
+		# templates
+		
+		db_foreach get_portal_templates { } {
+		    project_manager_portlet::add_self_to_page \
+			-portal_id $portal_id \
+			-project_manager_id 0 \
+			-package_id 0
+
+		    project_manager_task_portlet::add_self_to_page \
+			-portal_id $portal_id \
+			-project_manager_id 0 \
+			-package_id 0
+		    
+		    project_manager_calendar_portlet::add_self_to_page \
+			-portal_id $portal_id \
+			-project_manager_id 0 \
+			-package_id 0
+		    
+		    project_manager_project_calendar_portlet::add_self_to_page \
+			-portal_id $portal_id \
+			-project_manager_id 0 \
+			-package_id 0
+		}
+	    }
+	}
+}
