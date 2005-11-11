@@ -121,13 +121,30 @@ ad_proc -public dotlrn_project_manager::add_applet_to_community_helper {
     
     # Add all portlets to the Portal.
     
-    project_manager_portlet::add_self_to_page -portal_id $portal_id -package_id $package_id -project_manager_id $package_id
+    project_manager_portlet::add_self_to_page \
+	-portal_id $portal_id \
+	-package_id $package_id \
+	-project_manager_id $package_id
 
-    project_manager_task_portlet::add_self_to_page -portal_id $portal_id  -package_id $package_id -project_manager_id $package_id
-    project_manager_calendar_portlet::add_self_to_page -portal_id $portal_id  -package_id $package_id -project_manager_id $package_id
+    project_manager_task_portlet::add_self_to_page \
+	-portal_id $portal_id \
+	-package_id $package_id \
+	-project_manager_id $package_id
+
+    project_manager_calendar_portlet::add_self_to_page \
+	-portal_id $portal_id \
+	-package_id $package_id \
+	-project_manager_id $package_id
     
-    project_manager_project_calendar_portlet::add_self_to_page -portal_id $portal_id  -package_id $package_id -project_manager_id $package_id
+    project_manager_project_calendar_portlet::add_self_to_page \
+	-portal_id $portal_id \
+	-package_id $package_id \
+	-project_manager_id $package_id
     
+    project_manager_projects_portlet::add_self_to_page \
+	-portal_id $portal_id \
+	-package_id $package_id \
+	-project_manager_id $package_id
     
     # instantiate and mount the logger package for this pm
     
@@ -232,9 +249,12 @@ ad_proc -public dotlrn_project_manager::add_user_to_community {
 	-project_manager_id $package_id \
         -param_action $param_action
     
+    project_manager_projects_portlet::add_self_to_page \
+        -portal_id $portal_id \
+        -package_id $package_id \
+	-project_manager_id $package_id \
+        -param_action $param_action
 
-    
-    
 }
 
 ad_proc -public dotlrn_project_manager::remove_user_from_community {
@@ -252,6 +272,7 @@ ad_proc -public dotlrn_project_manager::add_portlet {
     
     @param portal_id
 } {
+
     project_manager_portlet::add_self_to_page \
 	-portal_id $portal_id \
 	-project_manager_id 0 \
@@ -268,6 +289,11 @@ ad_proc -public dotlrn_project_manager::add_portlet {
 	-package_id 0
 
     project_manager_project_calendar_portlet::add_self_to_page \
+	-portal_id $portal_id \
+	-project_manager_id 0 \
+	-package_id 0
+
+    project_manager_projects_portlet::add_self_to_page \
 	-portal_id $portal_id \
 	-project_manager_id 0 \
 	-package_id 0
@@ -309,6 +335,10 @@ ad_proc -public dotlrn_project_manager::remove_portlet {
 	-project_manager_id [ns_set get $args "project_manager_id"]
 
     project_manager_portlet::remove_self_from_page \
+	-portal_id $portal_id \
+	-project_manager_id [ns_set get $args "project_manager_id"]
+
+    project_manager_projects_portlet::remove_self_from_page \
 	-portal_id $portal_id \
 	-project_manager_id [ns_set get $args "project_manager_id"]
     
@@ -393,6 +423,17 @@ ad_proc -private dotlrn_project_manager::upgrade {
 			-portal_id $portal_id \
 			-project_manager_id 0 \
 			-package_id 0
+		}
+	    }
+	    
+	    0.1d1 0.1d2 {
+		db_foreach get_all_portal_templates { } {
+
+		    project_manager_projects_portlet::add_self_to_page \
+			-portal_id $portal_id \
+			-project_manager_id 0 \
+			-package_id 0
+
 		}
 	    }
 	}
