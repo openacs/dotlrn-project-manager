@@ -146,19 +146,10 @@ ad_proc -public dotlrn_project_manager::add_applet_to_community_helper {
 	-package_id $package_id \
 	-project_manager_id $package_id
     
+
     # instantiate and mount the logger package for this pm
+    callback dotlrn_project_manager::new_community -community_id $community_id -package_id $package_id
     
-    set logger_package_id [dotlrn::instantiate_and_mount \
-			       -mount_point "logger" \
-			       $community_id \
-			       "logger" \
-			      ]
-    
-    # (appl.)link the pm to the logger,
-    
-    
-    
-    application_link::new -this_package_id $package_id -target_package_id $logger_package_id
     
     
     # and now to the existing fs, conntacts, forums package
